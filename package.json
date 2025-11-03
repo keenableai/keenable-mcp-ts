@@ -1,5 +1,5 @@
 {
-  "name": "keenable-mcp-server",
+  "name": "@keenable/mcp-server",
   "version": "1.0.0",
   "description": "MCP server for Keenable AI search, fetch, and feedback APIs",
   "type": "module",

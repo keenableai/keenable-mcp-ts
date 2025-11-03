@@ -23,7 +23,7 @@ Add to your MCP client configuration (e.g., Claude Desktop at `~/Library/Applica
   "mcpServers": {
     "keenable": {
       "command": "npx",
-      "args": ["keenable-mcp-server"],
+      "args": ["@keenable/mcp-server"],
       "env": {
         "KEENABLE_API_KEY": "your-api-key-here"
       }
