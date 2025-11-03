@@ -18,21 +18,11 @@ Supports both authenticated (no rate limits) and public (30 requests per IP per 
 
 Add to your MCP client configuration (e.g., Claude Desktop at `~/Library/Application Support/Claude/claude_desktop_config.json`):
 
-```json
-{
-  "mcpServers": {
-    "keenable": {
-      "command": "npx",
-      "args": ["@keenable/mcp-server"],
-      "env": {
-        "KEENABLE_API_KEY": "your-api-key-here"
-      }
-    }
-  }
-}
-```
+| **Public** (30 requests per IP per 15 min) | **Authenticated** (no rate limits) |
+|------|---------------|
+| <pre lang="json">{<br>  "mcpServers": {<br>    "keenable": {<br>      "command": "npx",<br>      "args": ["-y", "@keenable/mcp-server"]<br>    }<br>  }<br>}</pre> | <pre lang="json">{<br>  "mcpServers": {<br>    "keenable": {<br>      "command": "npx",<br>      "args": ["-y", "@keenable/mcp-server"],<br>      "env": {<br>        "KEENABLE_API_KEY": "your-api-key-here"<br>      }<br>    }<br>  }<br>}</pre> |
 
-Omit the `env` section to use public endpoints. Get your API key at [https://keenable.ai](https://keenable.ai).
+Get your API key at [https://keenable.ai](https://keenable.ai).
 
 ## Development
 
