@@ -4,15 +4,15 @@
   "description": "MCP server for Keenable AI search, fetch, and feedback APIs",
   "type": "module",
   "main": "build/index.js",
-  "files": ["build", "README.md"],
-  "prepublishOnly": "npm run build",
+  "files": ["build", "README.md", "LICENSE"],
   "bin": {
     "keenable-mcp-server": "./build/index.js"
   },
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",
-    "dev": "tsc && node build/index.js"
+    "dev": "tsc && node build/index.js",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "mcp",
