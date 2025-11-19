@@ -29,7 +29,7 @@ export const feedbackTool: ToolDefinition = {
   },
 };
 
-export const feedbackHandler: ToolHandler = async (args) => {
+export const feedbackHandler: ToolHandler = async (args, authHeaders) => {
   const { query, feedback, feedback_text } = args as {
     query: string;
     feedback: Record<string, number>;
@@ -42,7 +42,7 @@ export const feedbackHandler: ToolHandler = async (args) => {
       body.feedback_text = feedback_text;
     }
 
-    const data = await makeApiRequest("/v1/feedback", "POST", body);
+    const data = await makeApiRequest("/v1/feedback", "POST", body, undefined, 3, authHeaders);
 
     return {
       content: [

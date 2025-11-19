@@ -31,14 +31,23 @@ export class UnauthorizedError extends Error {
   }
 }
 
+export interface AuthHeaders {
+  "X-API-Key"?: string;
+  "Authorization"?: string;
+}
+
 export async function makeApiRequest(
   endpoint: string,
   method: "GET" | "POST" = "GET",
   body?: any,
   queryParams?: Record<string, string>,
-  maxRetries: number = 3
+  maxRetries: number = 3,
+  authHeaders?: AuthHeaders
 ): Promise<any> {
-  const isPublic = !API_KEY;
+  // Priority: authHeaders > API_KEY env variable
+  const apiKey = authHeaders?.["X-API-Key"] || API_KEY;
+  const bearerToken = authHeaders?.["Authorization"];
+  const isPublic = !apiKey && !bearerToken;
   const path = isPublic ? `${endpoint}/public` : endpoint;
   
   let url = `${API_BASE_URL}${path}`;
@@ -52,8 +61,12 @@ export async function makeApiRequest(
     "User-Agent": USER_AGENT,
   };
 
-  if (!isPublic && API_KEY) {
-    headers["X-API-Key"] = API_KEY;
+  // Add authentication headers if present
+  if (apiKey) {
+    headers["X-API-Key"] = apiKey;
+  }
+  if (bearerToken) {
+    headers["Authorization"] = bearerToken;
   }
 
   const options: RequestInit = {

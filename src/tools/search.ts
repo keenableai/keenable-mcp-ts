@@ -23,7 +23,7 @@ export const searchTool: ToolDefinition = {
   },
 };
 
-export const searchHandler: ToolHandler = async (args) => {
+export const searchHandler: ToolHandler = async (args, authHeaders) => {
   const { query, count = 10 } = args as {
     query: string;
     count?: number;
@@ -33,7 +33,7 @@ export const searchHandler: ToolHandler = async (args) => {
     const data = await makeApiRequest("/v1/search", "GET", undefined, {
       query,
       count: count.toString(),
-    });
+    }, 3, authHeaders);
 
     return {
       content: [
