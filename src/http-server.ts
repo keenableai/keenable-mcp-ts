@@ -38,6 +38,11 @@ const server = new McpServer(
   {
     name: packageJson.name,
     version: packageJson.version,
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
   }
 );
 
