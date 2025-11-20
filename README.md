@@ -61,22 +61,28 @@ npm install @keenable/mcp-server
 
 ```typescript
 import { tools, toolHandlers } from '@keenable/mcp-server';
-import type { AuthHeaders } from '@keenable/mcp-server';
 
-// Use in your MCP server implementation
-const handler = toolHandlers['search_web_pages'];
-const result = await handler(
+// Option 1: Use environment variable (stdio MCP servers)
+process.env.KEENABLE_API_KEY = 'your-api-key';
+const result1 = await toolHandlers['search_web_pages']({ query: 'TypeScript', count: 5 });
+
+// Option 2: Pass API key explicitly (HTTP servers, per-request auth)
+const result2 = await toolHandlers['search_web_pages'](
   { query: 'TypeScript', count: 5 },
-  { 'X-API-Key': 'your-api-key' } // optional auth headers
+  'your-api-key' // optional apiKey parameter
 );
 ```
 
 **Exported items:**
 - `tools` - Array of MCP tool definitions
 - `toolHandlers` - Object mapping tool names to handler functions
-- `AuthHeaders` - TypeScript type for authentication headers
 - `ToolDefinition` - TypeScript type for tool definitions
-- `ToolHandler` - TypeScript type for tool handler functions
+- `ToolHandler` - TypeScript type: `(args: any, apiKey?: string) => Promise<CallToolResult>`
+
+**Authentication:**
+- **Environment variable**: Set `KEENABLE_API_KEY` for stdio MCP servers (Claude Desktop)
+- **Per-request**: Pass `apiKey` as second parameter for HTTP servers with per-request authentication
+- **Public**: Without auth, requests use public endpoints with rate limits (30 requests per IP per 15 minutes)
 
 See [keenable-backend-ts](https://github.com/keenableai/keenable-backend-ts) for an example of building an HTTP server with this package.
 

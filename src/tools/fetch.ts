@@ -20,7 +20,7 @@ export const fetchTool: ToolDefinition = {
   },
 };
 
-export const fetchHandler: ToolHandler = async (args, authHeaders) => {
+export const fetchHandler: ToolHandler = async (args, apiKey) => {
   const { urls } = args as { urls: string[] };
 
   try {
@@ -30,7 +30,7 @@ export const fetchHandler: ToolHandler = async (args, authHeaders) => {
     for (let i = 0; i < urls.length; i += CHUNK_SIZE) {
       const chunk = urls.slice(i, i + CHUNK_SIZE);
       const chunkResults = await Promise.all(
-        chunk.map(url => makeApiRequest("/v1/fetch", "GET", undefined, { url }, 3, authHeaders))
+        chunk.map(url => makeApiRequest("/v1/fetch", "GET", undefined, { url }, 3, apiKey))
       );
       results.push(...chunkResults);
     }

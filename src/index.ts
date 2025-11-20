@@ -19,7 +19,6 @@ const packageJson = JSON.parse(
 
 // Export for use by other packages
 export { tools, toolHandlers } from "./tools/index.js";
-export type { AuthHeaders } from "./api.js";
 export type { ToolDefinition, ToolHandler } from "./types.js";
 
 const server = new Server(
