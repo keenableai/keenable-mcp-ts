@@ -17,6 +17,10 @@ const packageJson = JSON.parse(
   readFileSync(join(__dirname, "../package.json"), "utf-8")
 );
 
+// Export for use by other packages
+export { tools, toolHandlers } from "./tools/index.js";
+export type { ToolDefinition, ToolHandler } from "./types.js";
+
 const server = new Server(
   {
     name: packageJson.name,

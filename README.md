@@ -1,14 +1,14 @@
 # Keenable MCP Server
 
-A Model Context Protocol (MCP) server providing web search, content fetching, and feedback tools powered by Keenable AI. Supports both stdio and HTTP streamable transports.
+A Model Context Protocol (MCP) library and stdio server providing web search, content fetching, and feedback tools powered by Keenable AI.
 
 ## Features
 
 - **search_web_pages** - Search the web with Keenable AI
 - **fetch_page_content** - Extract content from one or more URLs in markdown format
 - **submit_search_feedback** - Submit relevance feedback to improve search quality
-- **HTTP Streamable Transport** - RESTful API with Server-Sent Events support
 - **Stdio Transport** - Standard MCP communication for local clients
+- **NPM Package** - Import tools and handlers in your own applications
 
 Supports both authenticated (no rate limits) and public (30 requests per IP per 15 minutes) modes.
 
@@ -51,77 +51,40 @@ Add to your MCP client configuration (e.g., Claude Desktop at `~/Library/Applica
 
 Get your API key at [https://keenable.ai](https://keenable.ai).
 
-## HTTP Streamable Mode
+## Using as an NPM Package
 
-The server also supports HTTP streamable transport for web-based applications and remote clients.
-
-### Starting the HTTP Server
+Install the package and import the tools in your own application:
 
 ```bash
-# Development mode
-npm run dev:http
-
-# Production mode
-npm run start:http
+npm install @keenable/mcp-server
 ```
 
-The server will start on `http://localhost:3000/mcp` by default. You can customize the port and host:
+```typescript
+import { tools, toolHandlers } from '@keenable/mcp-server';
 
-```bash
-PORT=8080 HOST=0.0.0.0 npm run start:http
+// Option 1: Use environment variable (stdio MCP servers)
+process.env.KEENABLE_API_KEY = 'your-api-key';
+const result1 = await toolHandlers['search_web_pages']({ query: 'TypeScript', count: 5 });
+
+// Option 2: Pass API key explicitly (HTTP servers, per-request auth)
+const result2 = await toolHandlers['search_web_pages'](
+  { query: 'TypeScript', count: 5 },
+  'your-api-key' // optional apiKey parameter
+);
 ```
 
-### HTTP API Endpoints
+**Exported items:**
+- `tools` - Array of MCP tool definitions
+- `toolHandlers` - Object mapping tool names to handler functions
+- `ToolDefinition` - TypeScript type for tool definitions
+- `ToolHandler` - TypeScript type: `(args: any, apiKey?: string) => Promise<CallToolResult>`
 
-- **POST /mcp** - Main MCP communication endpoint
-- **GET /mcp** - Server-to-client notifications via SSE (with sessions)
-- **DELETE /mcp** - Session termination (with sessions)
-- **GET /health** - Health check endpoint
+**Authentication:**
+- **Environment variable**: Set `KEENABLE_API_KEY` for stdio MCP servers (Claude Desktop)
+- **Per-request**: Pass `apiKey` as second parameter for HTTP servers with per-request authentication
+- **Public**: Without auth, requests use public endpoints with rate limits (30 requests per IP per 15 minutes)
 
-### Example Client Usage
-
-```javascript
-// Using MCP client with HTTP transport
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-
-const client = new Client({
-  name: 'example-client',
-  version: '1.0.0'
-});
-
-const transport = new StreamableHTTPClientTransport(new URL('http://localhost:3000/mcp'));
-await client.connect(transport);
-
-// Use tools
-const result = await client.callTool({
-  name: 'search_web_pages',
-  arguments: { query: 'TypeScript MCP server', count: 5 }
-});
-```
-
-### Stateless vs Stateful Mode
-
-The HTTP server runs in **stateless mode** by default, creating a new transport for each request. This is suitable for:
-
-- API gateways and load balancers
-- Serverless environments
-- Simple client-server interactions
-
-For **stateful sessions** (maintaining conversation state), clients can include session management headers.
-
-### Example Usage
-
-```bash
-# Start the HTTP server
-npm run start:http
-
-# Run the example client (requires server to be running)
-npm run example:http
-
-# Run the automated test (starts server, runs tests, stops server)
-npm run test:http
-```
+See [keenable-backend-ts](https://github.com/keenableai/keenable-backend-ts) for an example of building an HTTP server with this package.
 
 ## Development
 
@@ -134,15 +97,9 @@ npm install
 npm run build
 ```
 
-## CI/CD
+## Publishing
 
-This project uses GitHub Actions for automated building, testing, and deployment:
-
-- **Automated Testing**: Runs on every push and pull request
-- **ECR Deployment**: Automatically builds and pushes Docker images to AWS ECR on main branch and version tags
-- **npm Publishing**: Automatically publishes to npm registry on version tags
-
-See [CI/CD Setup Guide](.github/CICD_SETUP.md) for configuration details.
+This project uses GitHub Actions to automatically publish to npm registry on version tags.
 
 ### Publishing a New Version
 
@@ -151,7 +108,7 @@ npm version patch  # or minor, or major
 git push && git push --tags
 ```
 
-This will automatically trigger ECR build and npm publish workflows.
+This will automatically trigger the npm publish workflow.
 
 ## Tools
 
