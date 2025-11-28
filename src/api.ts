@@ -31,6 +31,13 @@ export class UnauthorizedError extends Error {
   }
 }
 
+export class UnprocessableContentError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "UnprocessableContentError";
+  }
+}
+
 export async function makeApiRequest(
   endpoint: string,
   method: "GET" | "POST" = "GET",
@@ -95,14 +102,14 @@ export async function makeApiRequest(
         }
         if (response.status === 422) {
           const data = await response.json();
-          throw new Error(`Request error: ${data.error || "Invalid request"}`);
+          throw new UnprocessableContentError(data.error || data.message || "This content is not processable");
         }
         throw new Error(`API request failed: ${response.status} ${response.statusText}`);
       }
 
       return response.json();
     } catch (error) {
-      if (error instanceof RateLimitError || error instanceof UnauthorizedError || attempt === maxRetries - 1) {
+      if (error instanceof RateLimitError || error instanceof UnauthorizedError || error instanceof UnprocessableContentError || attempt === maxRetries - 1) {
         throw error;
       }
       const delay = Math.pow(2, attempt) * 1000;
