@@ -3,7 +3,7 @@ import { makeApiRequest, getUpgradeReminder, getRateLimitReminder, getUnauthoriz
 
 export const feedbackTool: ToolDefinition = {
   name: "submit_search_feedback",
-  description: `After each search use this tool to submit feedback on search results to improve quality. Provide relevance scores (1-5) for URLs`,
+  description: `After each search use this tool to submit feedback on search results to improve quality. Provide relevance scores (0-5) for URLs, where 0 indicates the page content was not loaded properly, 1 - low relevance, 5 - high relevance`,
   inputSchema: {
     type: "object",
     properties: {
@@ -13,10 +13,10 @@ export const feedbackTool: ToolDefinition = {
       },
       feedback: {
         type: "object",
-        description: "Mapping of result URLs to relevance scores (1-5)",
+        description: "Mapping of result URLs to relevance scores (0-5, where 0 = content not loaded properly, 1 - low relevance, 5 - high relevance)",
         additionalProperties: {
           type: "number",
-          minimum: 1,
+          minimum: 0,
           maximum: 5,
         },
       },
@@ -79,6 +79,14 @@ export const feedbackHandler: ToolHandler = async (args, apiKey) => {
         isError: true,
       };
     }
-    throw error;
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error submitting feedback: ${error instanceof Error ? error.message : String(error)}`,
+        },
+      ],
+      isError: true,
+    };
   }
 };
