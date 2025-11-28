@@ -10,14 +10,7 @@ export const searchTool: ToolDefinition = {
       query: {
         type: "string",
         description: "The search query",
-      },
-      count: {
-        type: "number",
-        description: "Number of results to return (1-20)",
-        minimum: 1,
-        maximum: 20,
-        default: 10,
-      },
+      }
     },
     required: ["query"],
   },
@@ -70,6 +63,14 @@ export const searchHandler: ToolHandler = async (args, apiKey) => {
         isError: true,
       };
     }
-    throw error;
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error performing search: ${error instanceof Error ? error.message : String(error)}`,
+        },
+      ],
+      isError: true,
+    };
   }
 };
