@@ -34,7 +34,7 @@ export const searchHandler: ToolHandler = async (args, apiKey) => {
           type: "text",
           text: JSON.stringify(data, null, 2),
         },
-        ...(!isAuthenticated() ? [{
+        ...(!isAuthenticated(apiKey) ? [{
           type: "text" as const,
           text: getUpgradeReminder(),
         }] : []),

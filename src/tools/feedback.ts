@@ -50,7 +50,7 @@ export const feedbackHandler: ToolHandler = async (args, apiKey) => {
           type: "text",
           text: data.message,
         },
-        ...(!isAuthenticated() ? [{
+        ...(!isAuthenticated(apiKey) ? [{
           type: "text" as const,
           text: getUpgradeReminder(),
         }] : []),
