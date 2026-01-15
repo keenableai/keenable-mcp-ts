@@ -118,8 +118,8 @@ export async function makeApiRequest(
   }
 }
 
-export function isAuthenticated(): boolean {
-  return !!API_KEY;
+export function isAuthenticated(apiKey?: string): boolean {
+  return !!(apiKey || API_KEY);
 }
 
 export function getUpgradeReminder(): string {
