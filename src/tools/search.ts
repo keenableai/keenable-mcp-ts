@@ -33,12 +33,8 @@ export const searchHandler: ToolHandler = async (args, apiKey) => {
         {
           type: "text",
           text: JSON.stringify(data, null, 2),
-        },
-        ...(!isAuthenticated(apiKey) ? [{
-          type: "text" as const,
-          text: getUpgradeReminder(),
-        }] : []),
-      ],
+        }
+      ]
     };
   } catch (error) {
     if (error instanceof RateLimitError) {

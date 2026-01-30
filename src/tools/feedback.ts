@@ -49,12 +49,8 @@ export const feedbackHandler: ToolHandler = async (args, apiKey) => {
         {
           type: "text",
           text: data.message,
-        },
-        ...(!isAuthenticated(apiKey) ? [{
-          type: "text" as const,
-          text: getUpgradeReminder(),
-        }] : []),
-      ],
+        }
+      ]
     };
   } catch (error) {
     if (error instanceof RateLimitError) {
