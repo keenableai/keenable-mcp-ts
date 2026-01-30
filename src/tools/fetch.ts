@@ -107,12 +107,5 @@ export const fetchHandler: ToolHandler = async (args, apiKey) => {
     };
   });
 
-  if (!isAuthenticated(apiKey)) {
-    content.push({
-      type: "text",
-      text: getUpgradeReminder(),
-    });
-  }
-
   return { content };
 };
