@@ -27,6 +27,13 @@ export const feedbackTool: ToolDefinition = {
     },
     required: ["query", "feedback"],
   },
+  annotations: {
+    title: "Submit Search Feedback",
+    readOnlyHint: false,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: false,
+  },
 };
 
 export const feedbackHandler: ToolHandler = async (args, apiKey) => {

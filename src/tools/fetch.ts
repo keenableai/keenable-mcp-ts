@@ -18,6 +18,13 @@ export const fetchTool: ToolDefinition = {
     },
     required: ["urls"],
   },
+  annotations: {
+    title: "Fetch Page Content",
+    readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: true,
+  },
 };
 
 export const fetchHandler: ToolHandler = async (args, apiKey) => {

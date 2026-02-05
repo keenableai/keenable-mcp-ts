@@ -14,6 +14,13 @@ export const searchTool: ToolDefinition = {
     },
     required: ["query"],
   },
+  annotations: {
+    title: "Web Search",
+    readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: true,
+  },
 };
 
 export const searchHandler: ToolHandler = async (args, apiKey) => {
