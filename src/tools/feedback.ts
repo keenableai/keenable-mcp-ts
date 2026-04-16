@@ -29,10 +29,10 @@ export const feedbackTool: ToolDefinition = {
   },
   annotations: {
     title: "Submit Search Feedback",
-    readOnlyHint: false,
-    destructiveHint: false,
+    readOnlyHint: false,       // This tool writes feedback data to improve search quality
+    destructiveHint: false,    // Feedback submissions only add data without deleting or overwriting existing records
     idempotentHint: true,
-    openWorldHint: false,
+    openWorldHint: false,      // Operates within a closed feedback system, not interacting with external services
   },
 };
 
