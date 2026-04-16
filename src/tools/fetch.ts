@@ -20,10 +20,10 @@ export const fetchTool: ToolDefinition = {
   },
   annotations: {
     title: "Fetch Page Content",
-    readOnlyHint: true,
-    destructiveHint: false,
+    readOnlyHint: true,        // This tool only reads and extracts content from URLs without modifying anything
+    destructiveHint: false,    // No data is deleted or overwritten when fetching page content
     idempotentHint: true,
-    openWorldHint: true,
+    openWorldHint: true,       // Fetches content from the open internet, accessing any publicly available URL
   },
 };
 

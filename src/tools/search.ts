@@ -16,10 +16,10 @@ export const searchTool: ToolDefinition = {
   },
   annotations: {
     title: "Web Search",
-    readOnlyHint: true,
-    destructiveHint: false,
+    readOnlyHint: true,        // This tool only retrieves search results without modifying any data
+    destructiveHint: false,    // No data is deleted or overwritten during search operations
     idempotentHint: true,
-    openWorldHint: true,
+    openWorldHint: true,       // Searches the open internet, interacting with external web pages and services
   },
 };
 
