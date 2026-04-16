@@ -1,4 +1,10 @@
 node_modules/
 build/
 *.log
+*.tsbuildinfo
 .DS_Store
+.env
+.env.*
+.claude/
+.idea/
+.vscode/
