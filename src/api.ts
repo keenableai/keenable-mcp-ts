@@ -9,7 +9,7 @@ const packageJson = JSON.parse(
 );
 
 const API_KEY = process.env.KEENABLE_API_KEY;
-const API_BASE_URL = "https://api.keenable.ai";
+const API_BASE_URL = process.env.KEENABLE_API_URL || "https://api.keenable.ai";
 const USER_AGENT = `${packageJson.name}/${packageJson.version}`;
 
 export class RateLimitError extends Error {

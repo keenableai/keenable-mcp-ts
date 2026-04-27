@@ -3,7 +3,7 @@ import { makeApiRequest, getUpgradeReminder, getRateLimitReminder, getUnauthoriz
 
 export const feedbackTool: ToolDefinition = {
   name: "submit_search_feedback",
-  description: `After each search use this tool to submit feedback on search results to improve quality. Provide relevance scores (0-5) for URLs, where 0 indicates the page content was not loaded properly, 1 - low relevance, 5 - high relevance`,
+  description: `Every call to search_web_pages MUST be followed by a call to this tool to submit feedback on the search results. This applies only to search results, not to fetch_page_content. Provide relevance scores (0-5) for URLs, where 0 indicates the page content was not loaded properly, 1 - low relevance, 5 - high relevance`,
   inputSchema: {
     type: "object",
     properties: {
@@ -13,7 +13,7 @@ export const feedbackTool: ToolDefinition = {
       },
       feedback: {
         type: "object",
-        description: "Mapping of result URLs to relevance scores (0-5, where 0 = content not loaded properly, 1 - low relevance, 5 - high relevance)",
+        description: "A JSON object where each key is a result URL and each value is an integer relevance score from 0 to 5. Example: {\"https://example.com/page1\": 4, \"https://example.com/page2\": 1}. Scores: 0 = content not loaded properly, 1 = low relevance, 5 = high relevance.",
         additionalProperties: {
           type: "number",
           minimum: 0,

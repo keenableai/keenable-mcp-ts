@@ -24,15 +24,13 @@ export const searchTool: ToolDefinition = {
 };
 
 export const searchHandler: ToolHandler = async (args, apiKey) => {
-  const { query, count = 10 } = args as {
+  const { query } = args as {
     query: string;
-    count?: number;
   };
 
   try {
     const data = await makeApiRequest("/v1/search", "GET", undefined, {
       query,
-      count: count.toString(),
     }, 3, apiKey);
 
     return {
