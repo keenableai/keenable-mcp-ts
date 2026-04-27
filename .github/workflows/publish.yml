@@ -24,8 +24,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: "https://registry.npmjs.org"
+
+      - run: npm install -g npm@latest
 
       - run: npm ci
 
@@ -38,9 +40,7 @@ jobs:
       - run: npm run build
 
       - name: Publish with provenance
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
 
       - name: Push version commit and tag
         run: git push --follow-tags
