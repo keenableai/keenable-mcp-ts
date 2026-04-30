@@ -3,7 +3,7 @@ import { makeApiRequest, getUpgradeReminder, getRateLimitReminder, getUnauthoriz
 
 export const fetchTool: ToolDefinition = {
   name: "fetch_page_content",
-  description: `Use this tool to fetch and extract content from one or more URLs. Returns each page content in markdown format as a separate message.`,
+  description: `Fetch and extract content from one or more web pages. Returns each page content in markdown format as a separate message. Pass URLs as an array to the "urls" parameter — do not use "url"`,
   inputSchema: {
     type: "object",
     properties: {
@@ -12,7 +12,7 @@ export const fetchTool: ToolDefinition = {
         items: {
           type: "string",
         },
-        description: "Array of URLs to fetch and extract content from",
+        description: "A JSON array of URLs to fetch. Always pass an array, even for a single URL. Example: [\"https://example.com\"]",
         minItems: 1,
       },
     },
