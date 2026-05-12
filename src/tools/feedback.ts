@@ -3,7 +3,7 @@ import { makeApiRequest, getUpgradeReminder, getRateLimitReminder, getUnauthoriz
 
 export const feedbackTool: ToolDefinition = {
   name: "submit_search_feedback",
-  description: `Every call to search_web_pages MUST be followed by a call to this tool to submit feedback on the search results. This applies only to search results, not to fetch_page_content. Provide relevance scores (0-5) for URLs, where 0 indicates the page content was not loaded properly, 1 - low relevance, 5 - high relevance`,
+  description: `Every call to search_web_pages MUST be followed by a call to this tool to submit feedback on the search results. This applies only to search results, not to fetch_page_content. For each URL returned by search, provide a relevance score (0-5) and a comment explaining the score. Scores: 0 = content not loaded properly, 1 = not relevant at all, 2 = slightly relevant, 3 = moderately relevant, 4 = very relevant, 5 = perfectly relevant.`,
   inputSchema: {
     type: "object",
     properties: {
@@ -11,45 +11,50 @@ export const feedbackTool: ToolDefinition = {
         type: "string",
         description: "The original search query",
       },
-      feedback: {
-        type: "object",
-        description: "A JSON object where each key is a result URL and each value is an integer relevance score from 0 to 5. Example: {\"https://example.com/page1\": 4, \"https://example.com/page2\": 1}. Scores: 0 = content not loaded properly, 1 = low relevance, 5 = high relevance.",
-        additionalProperties: {
-          type: "number",
-          minimum: 0,
-          maximum: 5,
+      relevance: {
+        type: "array",
+        description: "Per-URL relevance scores and comments",
+        items: {
+          type: "object",
+          properties: {
+            url: {
+              type: "string",
+              description: "The result URL being scored",
+            },
+            score: {
+              type: "number",
+              minimum: 0,
+              maximum: 5,
+              description: "Relevance score from 0 to 5",
+            },
+            comment: {
+              type: "string",
+              description: "Explanation of why this score was given",
+            },
+          },
+          required: ["url", "score", "comment"],
         },
       },
-      feedback_text: {
-        type: "string",
-        description: "Additional feedback text (optional)",
-      },
     },
-    required: ["query", "feedback"],
+    required: ["query", "relevance"],
   },
   annotations: {
     title: "Submit Search Feedback",
-    readOnlyHint: false,       // This tool writes feedback data to improve search quality
-    destructiveHint: false,    // Feedback submissions only add data without deleting or overwriting existing records
+    readOnlyHint: false,
+    destructiveHint: false,
     idempotentHint: true,
-    openWorldHint: false,      // Operates within a closed feedback system, not interacting with external services
+    openWorldHint: false,
   },
 };
 
 export const feedbackHandler: ToolHandler = async (args, apiKey) => {
-  const { query, feedback, feedback_text } = args as {
+  const { query, relevance } = args as {
     query: string;
-    feedback: Record<string, number>;
-    feedback_text?: string;
+    relevance: Array<{ url: string; score: number; comment: string }>;
   };
 
   try {
-    const body: any = { query, feedback };
-    if (feedback_text) {
-      body.feedback_text = feedback_text;
-    }
-
-    const data = await makeApiRequest("/v1/feedback", "POST", body, undefined, 3, apiKey);
+    const data = await makeApiRequest("/v1/feedback", "POST", { query, relevance }, undefined, 3, apiKey);
 
     return {
       content: [
