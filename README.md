@@ -107,31 +107,45 @@ One text block per URL, each containing:
 
 ### submit_search_feedback
 
-Submit per-URL relevance scores after a search to improve result quality over time.
+Submit per-URL relevance scores and comments after a search to improve result quality over time.
 
 **Input**
 
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `query` | string | yes | The original search query |
-| `feedback` | object | yes | Map of URL to relevance score (0–5) |
-| `feedback_text` | string | no | Additional feedback in free text |
+| `relevance` | array | yes | Per-URL relevance entries |
+| `relevance[].url` | string | yes | The result URL being scored |
+| `relevance[].score` | number | yes | Relevance score (0–5) |
+| `relevance[].comment` | string | yes | Explanation of why this score was given |
 
-Score scale: 0 = content not loaded, 1 = low relevance, 2 = somewhat relevant, 3 = relevant, 4 = highly relevant, 5 = perfect match.
+Score scale: 0 = content not loaded, 1 = not relevant at all, 2 = slightly relevant, 3 = moderately relevant, 4 = very relevant, 5 = perfectly relevant.
+
+**Input example**
+
+```json
+{
+  "query": "TypeScript best practices",
+  "relevance": [
+    {
+      "url": "https://example.com/ts-best-practices",
+      "score": 5,
+      "comment": "Comprehensive guide covering exactly what was asked"
+    },
+    {
+      "url": "https://example.com/js-patterns",
+      "score": 2,
+      "comment": "Covers JavaScript patterns but not TypeScript-specific"
+    }
+  ]
+}
+```
 
 **Output**
 
 | Field | Type | Description |
 |---|---|---|
 | `message` | string | Confirmation message |
-
-**Output example**
-
-```json
-{
-  "message": "Feedback submitted successfully"
-}
-```
 
 ---
 
