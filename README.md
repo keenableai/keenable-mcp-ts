@@ -47,6 +47,11 @@ Search the web and return ranked results with URLs, titles, and descriptions.
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `query` | string | yes | The search query |
+| `site` | string | no | Restrict results to a specific site (e.g. `"techcrunch.com"`) |
+| `acquired_after` | string | no | Filter to pages acquired/indexed after this date (YYYY-MM-DD) |
+| `acquired_before` | string | no | Filter to pages acquired/indexed before this date (YYYY-MM-DD) |
+| `published_after` | string | no | Filter to pages published after this date (YYYY-MM-DD) |
+| `published_before` | string | no | Filter to pages published before this date (YYYY-MM-DD) |
 
 **Output**
 
@@ -56,6 +61,8 @@ Search the web and return ranked results with URLs, titles, and descriptions.
 | `results[].title` | string | Page title |
 | `results[].url` | string | Page URL |
 | `results[].description` | string | Snippet / summary of the page |
+| `results[].published_at` | string | When the page was published (ISO 8601, if available) |
+| `results[].acquired_at` | string | When the page was acquired/indexed (ISO 8601, if available) |
 
 **Output example**
 
@@ -65,7 +72,9 @@ Search the web and return ranked results with URLs, titles, and descriptions.
     {
       "title": "TypeScript Best Practices 2026",
       "url": "https://example.com/ts-best-practices",
-      "description": "A comprehensive guide to modern TypeScript patterns and best practices."
+      "description": "A comprehensive guide to modern TypeScript patterns and best practices.",
+      "published_at": "2026-01-15T10:30:00Z",
+      "acquired_at": "2026-01-16T08:12:34Z"
     }
   ]
 }
