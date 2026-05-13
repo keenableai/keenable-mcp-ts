@@ -10,7 +10,27 @@ export const searchTool: ToolDefinition = {
       query: {
         type: "string",
         description: "The search query",
-      }
+      },
+      site: {
+        type: "string",
+        description: "Restrict results to a specific site (e.g. \"techcrunch.com\")",
+      },
+      acquired_after: {
+        type: "string",
+        description: "Filter results to pages acquired/indexed after this date (YYYY-MM-DD)",
+      },
+      acquired_before: {
+        type: "string",
+        description: "Filter results to pages acquired/indexed before this date (YYYY-MM-DD)",
+      },
+      published_after: {
+        type: "string",
+        description: "Filter results to pages published after this date (YYYY-MM-DD)",
+      },
+      published_before: {
+        type: "string",
+        description: "Filter results to pages published before this date (YYYY-MM-DD)",
+      },
     },
     required: ["query"],
   },
@@ -23,15 +43,25 @@ export const searchTool: ToolDefinition = {
   },
 };
 
+const SEARCH_FILTER_KEYS = ["site", "acquired_after", "acquired_before", "published_after", "published_before"] as const;
+
 export const searchHandler: ToolHandler = async (args, apiKey) => {
-  const { query } = args as {
+  const { query, ...rest } = args as {
     query: string;
+    site?: string;
+    acquired_after?: string;
+    acquired_before?: string;
+    published_after?: string;
+    published_before?: string;
   };
 
+  const body: Record<string, string> = { query };
+  for (const key of SEARCH_FILTER_KEYS) {
+    if (rest[key]) body[key] = rest[key];
+  }
+
   try {
-    const data = await makeApiRequest("/v1/search", "GET", undefined, {
-      query,
-    }, 3, apiKey);
+    const data = await makeApiRequest("/v1/search", "POST", body, undefined, 3, apiKey);
 
     return {
       content: [
