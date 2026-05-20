@@ -31,6 +31,11 @@ export const searchTool: ToolDefinition = {
         type: "string",
         description: "Filter results to pages published before this date (YYYY-MM-DD)",
       },
+      mode: {
+        type: "string",
+        enum: ["standard", "pro"],
+        description: "Search mode: 'standard' (default) or 'pro' for enhanced results",
+      },
     },
     required: ["query"],
   },
@@ -46,8 +51,9 @@ export const searchTool: ToolDefinition = {
 const SEARCH_FILTER_KEYS = ["site", "acquired_after", "acquired_before", "published_after", "published_before"] as const;
 
 export const searchHandler: ToolHandler = async (args, apiKey) => {
-  const { query, ...rest } = args as {
+  const { query, mode, ...rest } = args as {
     query: string;
+    mode?: "standard" | "pro";
     site?: string;
     acquired_after?: string;
     acquired_before?: string;
@@ -56,6 +62,7 @@ export const searchHandler: ToolHandler = async (args, apiKey) => {
   };
 
   const body: Record<string, string> = { query };
+  if (mode) body.mode = mode;
   for (const key of SEARCH_FILTER_KEYS) {
     if (rest[key]) body[key] = rest[key];
   }
