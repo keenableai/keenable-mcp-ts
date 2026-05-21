@@ -52,11 +52,13 @@ Search the web and return ranked results with URLs, titles, and descriptions.
 | `acquired_before` | string | no | Filter to pages acquired/indexed before this date (YYYY-MM-DD) |
 | `published_after` | string | no | Filter to pages published after this date (YYYY-MM-DD) |
 | `published_before` | string | no | Filter to pages published before this date (YYYY-MM-DD) |
+| `mode` | string | no | Search mode: `"standard"` (default, fastest) or `"pro"` (higher-quality results) |
 
 **Output**
 
 | Field | Type | Description |
 |---|---|---|
+| `mode` | string | Search mode used (`"standard"` or `"pro"`) |
 | `results` | array | List of search results |
 | `results[].title` | string | Page title |
 | `results[].url` | string | Page URL |
@@ -68,6 +70,8 @@ Search the web and return ranked results with URLs, titles, and descriptions.
 
 ```json
 {
+  "query": "TypeScript best practices",
+  "mode": "standard",
   "results": [
     {
       "title": "TypeScript Best Practices 2026",
@@ -178,37 +182,43 @@ For agents that don't support remote MCP connections, the server is available as
 }
 ```
 
+### Search mode configuration
+
+You can control the search mode via environment variables (stdio) or URL query params (remote MCP):
+
+| Setting | Env var (stdio) | Query param (remote) | Effect |
+|---|---|---|---|
+| Default mode | `KEENABLE_DEFAULT_SEARCH_MODE` | `default_search_mode` | Overrides the default when the agent doesn't specify `mode` |
+| Forced mode | `KEENABLE_FORCED_SEARCH_MODE` | `forced_search_mode` | Always uses this mode; hides the `mode` param from the tool schema |
+
+Valid values: `standard`, `pro`.
+
+**Stdio example** — always use pro mode:
+
+```json
+{
+  "mcpServers": {
+    "keenable": {
+      "command": "npx",
+      "args": ["-y", "@keenable/mcp-server"],
+      "env": {
+        "KEENABLE_API_KEY": "<YOUR_API_KEY>",
+        "KEENABLE_FORCED_SEARCH_MODE": "pro"
+      }
+    }
+  }
+}
+```
+
+**Remote MCP example** — default to pro mode (agent can still override):
+
+```
+https://api.keenable.ai/mcp?default_search_mode=pro
+```
+
 ### OAuth
 
 The remote MCP server at `https://api.keenable.ai/mcp` supports the MCP OAuth authorization flow, so clients can authenticate without manually passing an API key. In practice, most MCP clients have unstable OAuth implementations, so we don't currently recommend this path. Use an API key instead.
-
-### Using as an NPM package
-
-Install the package and import the tools in your own application:
-
-```bash
-npm install @keenable/mcp-server
-```
-
-```typescript
-import { tools, toolHandlers } from '@keenable/mcp-server';
-
-// Option 1: Use environment variable (stdio MCP servers)
-process.env.KEENABLE_API_KEY = 'your-api-key';
-const result1 = await toolHandlers['search_web_pages']({ query: 'TypeScript' });
-
-// Option 2: Pass API key explicitly (HTTP servers, per-request auth)
-const result2 = await toolHandlers['search_web_pages'](
-  { query: 'TypeScript' },
-  'your-api-key'
-);
-```
-
-**Exported items:**
-- `tools` - Array of MCP tool definitions
-- `toolHandlers` - Object mapping tool names to handler functions
-- `ToolDefinition` - TypeScript type for tool definitions
-- `ToolHandler` - TypeScript type: `(args: any, apiKey?: string) => Promise<CallToolResult>`
 
 ## Development
 

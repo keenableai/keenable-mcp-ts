@@ -1,5 +1,5 @@
 import { ToolDefinition, ToolHandler } from "../types.js";
-import { makeApiRequest, getUpgradeReminder, getRateLimitReminder, getUnauthorizedReminder, RateLimitError, UnauthorizedError, UnprocessableContentError, isAuthenticated } from "../api.js";
+import { makeApiRequest, getRateLimitReminder, RateLimitError } from "../api.js";
 
 export const fetchTool: ToolDefinition = {
   name: "fetch_page_content",
@@ -33,8 +33,7 @@ export const fetchHandler: ToolHandler = async (args, apiKey) => {
   const CHUNK_SIZE = 5;
   const results: Array<{ url: string; data?: any; error?: string }> = [];
   
-  let hasRateLimitError = false;
-  let hasUnauthorizedError = false;
+  let rateLimitError: RateLimitError | null = null;
   
   for (let i = 0; i < urls.length; i += CHUNK_SIZE) {
     const chunk = urls.slice(i, i + CHUNK_SIZE);
@@ -45,16 +44,12 @@ export const fetchHandler: ToolHandler = async (args, apiKey) => {
           return { url, data };
         } catch (error) {
           if (error instanceof RateLimitError) {
-            hasRateLimitError = true;
+            rateLimitError = error;
             throw error;
           }
-          if (error instanceof UnauthorizedError) {
-            hasUnauthorizedError = true;
-            throw error;
-          }
-          return { 
-            url, 
-            error: error instanceof Error ? error.message : String(error) 
+          return {
+            url,
+            error: error instanceof Error ? error.message : String(error)
           };
         }
       })
@@ -65,42 +60,28 @@ export const fetchHandler: ToolHandler = async (args, apiKey) => {
         results.push(result.value);
       } else {
         if (result.reason instanceof RateLimitError) {
-          hasRateLimitError = true;
-        } else if (result.reason instanceof UnauthorizedError) {
-          hasUnauthorizedError = true;
+          rateLimitError = result.reason;
         }
       }
     }
     
-    if (hasRateLimitError || hasUnauthorizedError) {
+    if (rateLimitError) {
       break;
     }
   }
 
-  if (hasRateLimitError) {
+  if (rateLimitError) {
     return {
       content: [
         {
           type: "text",
-          text: getRateLimitReminder(),
+          text: getRateLimitReminder(rateLimitError),
         },
       ],
       isError: true,
     };
   }
   
-  if (hasUnauthorizedError) {
-    return {
-      content: [
-        {
-          type: "text",
-          text: getUnauthorizedReminder(),
-        },
-      ],
-      isError: true,
-    };
-  }
-
   const content: any[] = results.map((result) => {
     if (result.error) {
       return {

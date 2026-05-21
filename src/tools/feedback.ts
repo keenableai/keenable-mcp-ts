@@ -1,5 +1,5 @@
 import { ToolDefinition, ToolHandler } from "../types.js";
-import { makeApiRequest, getUpgradeReminder, getRateLimitReminder, getUnauthorizedReminder, RateLimitError, UnauthorizedError, isAuthenticated } from "../api.js";
+import { makeApiRequest, getRateLimitReminder, RateLimitError } from "../api.js";
 
 export const feedbackTool: ToolDefinition = {
   name: "submit_search_feedback",
@@ -70,18 +70,7 @@ export const feedbackHandler: ToolHandler = async (args, apiKey) => {
         content: [
           {
             type: "text",
-            text: getRateLimitReminder(),
-          },
-        ],
-        isError: true,
-      };
-    }
-    if (error instanceof UnauthorizedError) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: getUnauthorizedReminder(),
+            text: getRateLimitReminder(error),
           },
         ],
         isError: true,
