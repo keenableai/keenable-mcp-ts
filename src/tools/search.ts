@@ -101,14 +101,8 @@ function resolveMode(argsMode: SearchMode | undefined, config?: SearchModeConfig
 
 /**
  * Create a search handler with the given mode config.
- * Falls back to reading KEENABLE_DEFAULT_SEARCH_MODE / KEENABLE_FORCED_SEARCH_MODE env vars.
  */
 export function createSearchHandler(config?: SearchModeConfig): ToolHandler {
-  const effectiveConfig: SearchModeConfig = config || {
-    defaultSearchMode: (process.env.KEENABLE_DEFAULT_SEARCH_MODE as SearchMode) || undefined,
-    forcedSearchMode: (process.env.KEENABLE_FORCED_SEARCH_MODE as SearchMode) || undefined,
-  };
-
   return async (args, apiKey) => {
     const { query, mode: argsMode, ...rest } = args as {
       query: string;
@@ -121,7 +115,7 @@ export function createSearchHandler(config?: SearchModeConfig): ToolHandler {
     };
 
     const body: Record<string, string> = { query };
-    const mode = resolveMode(argsMode, effectiveConfig);
+    const mode = resolveMode(argsMode, config);
     if (mode) body.mode = mode;
     for (const key of SEARCH_FILTER_KEYS) {
       if (rest[key]) body[key] = rest[key];
@@ -162,5 +156,3 @@ export function createSearchHandler(config?: SearchModeConfig): ToolHandler {
     }
   };
 }
-
-export const searchHandler: ToolHandler = createSearchHandler();
