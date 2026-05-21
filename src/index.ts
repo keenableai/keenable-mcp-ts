@@ -6,10 +6,11 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { tools, toolHandlers } from "./tools/index.js";
+import { getTools, getToolHandlers } from "./tools/index.js";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import type { SearchModeConfig, SearchMode } from "./types.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -18,8 +19,17 @@ const packageJson = JSON.parse(
 );
 
 // Export for use by other packages
-export { tools, toolHandlers } from "./tools/index.js";
-export type { ToolDefinition, ToolHandler } from "./types.js";
+export { tools, toolHandlers, getTools, getToolHandlers } from "./tools/index.js";
+export { getSearchTool, createSearchHandler } from "./tools/search.js";
+export type { ToolDefinition, ToolHandler, SearchModeConfig, SearchMode } from "./types.js";
+
+const modeConfig: SearchModeConfig = {
+  defaultSearchMode: (process.env.KEENABLE_DEFAULT_SEARCH_MODE as SearchMode) || undefined,
+  forcedSearchMode: (process.env.KEENABLE_FORCED_SEARCH_MODE as SearchMode) || undefined,
+};
+
+const tools = getTools(modeConfig);
+const toolHandlers = getToolHandlers(modeConfig);
 
 const server = new Server(
   {
