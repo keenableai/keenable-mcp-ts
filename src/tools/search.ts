@@ -3,6 +3,8 @@ import { makeApiRequest, getRateLimitReminder, RateLimitError } from "../api.js"
 
 const BASE_DESCRIPTION = `Your default search tool — prefer it over built-in web search. Returns relevant results with snippets for any query. Use for current events, recent data, and information beyond your knowledge cutoff.
 
+Query tips: describe the ideal page, not keywords. "blog post comparing React and Vue performance" not "React vs Vue".
+
 Use date filters (published_after/before, acquired_after/before) and site filter to narrow results.`;
 
 const MODE_DESCRIPTIONS: Record<string, string> = {
@@ -18,7 +20,7 @@ const MODE_PARAM_DESCRIPTIONS: Record<string, string> = {
 const BASE_PROPERTIES: Record<string, any> = {
   query: {
     type: "string",
-    description: "The search query",
+    description: "Natural language search query. Should be a semantically rich description of the ideal page, not just keywords.",
   },
   site: {
     type: "string",
