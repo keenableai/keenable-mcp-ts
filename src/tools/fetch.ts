@@ -15,6 +15,10 @@ export const fetchTool: ToolDefinition = {
         description: "A JSON array of URLs to fetch. Always pass an array, even for a single URL. Example: [\"https://example.com\"]",
         minItems: 1,
       },
+      staging: {
+        type: "boolean",
+        description: "Route request to the staging orchestrator (internal users only)",
+      },
     },
     required: ["urls"],
   },
@@ -28,7 +32,7 @@ export const fetchTool: ToolDefinition = {
 };
 
 export const fetchHandler: ToolHandler = async (args, apiKey) => {
-  const { urls } = args as { urls: string[] };
+  const { urls, staging } = args as { urls: string[]; staging?: boolean };
 
   const CHUNK_SIZE = 5;
   const results: Array<{ url: string; data?: any; error?: string }> = [];
@@ -40,7 +44,9 @@ export const fetchHandler: ToolHandler = async (args, apiKey) => {
     const chunkResults = await Promise.allSettled(
       chunk.map(async (url) => {
         try {
-          const data = await makeApiRequest("/v1/fetch", "GET", undefined, { url }, 3, apiKey);
+          const params: Record<string, string> = { url };
+          if (staging) params.staging = '1';
+          const data = await makeApiRequest("/v1/fetch", "GET", undefined, params, 3, apiKey);
           return { url, data };
         } catch (error) {
           if (error instanceof RateLimitError) {

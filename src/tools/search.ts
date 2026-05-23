@@ -40,6 +40,10 @@ const BASE_PROPERTIES: Record<string, any> = {
     type: "string",
     description: "Filter results to pages published before this date (YYYY-MM-DD)",
   },
+  staging: {
+    type: "boolean",
+    description: "Route request to the staging orchestrator (internal users only)",
+  },
 };
 
 function buildSearchTool(config?: SearchModeConfig): ToolDefinition {
@@ -104,9 +108,10 @@ function resolveMode(argsMode: SearchMode | undefined, config?: SearchModeConfig
  */
 export function createSearchHandler(config?: SearchModeConfig): ToolHandler {
   return async (args, apiKey) => {
-    const { query, mode: argsMode, ...rest } = args as {
+    const { query, mode: argsMode, staging, ...rest } = args as {
       query: string;
       mode?: SearchMode;
+      staging?: boolean;
       site?: string;
       acquired_after?: string;
       acquired_before?: string;
@@ -114,9 +119,10 @@ export function createSearchHandler(config?: SearchModeConfig): ToolHandler {
       published_before?: string;
     };
 
-    const body: Record<string, string> = { query };
+    const body: Record<string, any> = { query };
     const mode = resolveMode(argsMode, config);
     if (mode) body.mode = mode;
+    if (staging) body.staging = true;
     for (const key of SEARCH_FILTER_KEYS) {
       if (rest[key]) body[key] = rest[key];
     }
