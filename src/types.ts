@@ -12,3 +12,7 @@ export interface SearchModeConfig {
   defaultSearchMode?: SearchMode;
   forcedSearchMode?: SearchMode;
 }
+
+export interface ServerConfig extends SearchModeConfig {
+  staging?: boolean;
+}

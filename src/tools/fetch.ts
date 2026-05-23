@@ -1,4 +1,4 @@
-import { ToolDefinition, ToolHandler } from "../types.js";
+import { ToolDefinition, ToolHandler, ServerConfig } from "../types.js";
 import { makeApiRequest, getRateLimitReminder, RateLimitError } from "../api.js";
 
 export const fetchTool: ToolDefinition = {
@@ -15,10 +15,6 @@ export const fetchTool: ToolDefinition = {
         description: "A JSON array of URLs to fetch. Always pass an array, even for a single URL. Example: [\"https://example.com\"]",
         minItems: 1,
       },
-      staging: {
-        type: "boolean",
-        description: "Route request to the staging orchestrator (internal users only)",
-      },
     },
     required: ["urls"],
   },
@@ -31,8 +27,9 @@ export const fetchTool: ToolDefinition = {
   },
 };
 
-export const fetchHandler: ToolHandler = async (args, apiKey) => {
-  const { urls, staging } = args as { urls: string[]; staging?: boolean };
+export function createFetchHandler(config?: ServerConfig): ToolHandler {
+  return async (args, apiKey) => {
+  const { urls } = args as { urls: string[] };
 
   const CHUNK_SIZE = 5;
   const results: Array<{ url: string; data?: any; error?: string }> = [];
@@ -45,7 +42,7 @@ export const fetchHandler: ToolHandler = async (args, apiKey) => {
       chunk.map(async (url) => {
         try {
           const params: Record<string, string> = { url };
-          if (staging) params.staging = '1';
+          if (config?.staging) params.staging = '1';
           const data = await makeApiRequest("/v1/fetch", "GET", undefined, params, 3, apiKey);
           return { url, data };
         } catch (error) {
@@ -102,4 +99,7 @@ export const fetchHandler: ToolHandler = async (args, apiKey) => {
   });
 
   return { content };
-};
+  };
+}
+
+export const fetchHandler: ToolHandler = createFetchHandler();

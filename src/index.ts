@@ -10,7 +10,7 @@ import { getTools, getToolHandlers } from "./tools/index.js";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import type { SearchModeConfig, SearchMode } from "./types.js";
+import type { ServerConfig, SearchMode } from "./types.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -21,7 +21,7 @@ const packageJson = JSON.parse(
 // Export for use by other packages
 export { getTools, getToolHandlers } from "./tools/index.js";
 export { getSearchTool, createSearchHandler } from "./tools/search.js";
-export type { ToolDefinition, ToolHandler, SearchModeConfig, SearchMode } from "./types.js";
+export type { ToolDefinition, ToolHandler, SearchModeConfig, SearchMode, ServerConfig } from "./types.js";
 
 const VALID_MODES = new Set<string>(['standard', 'pro']);
 
@@ -35,13 +35,14 @@ function parseSearchMode(envVar: string): SearchMode | undefined {
   return value as SearchMode;
 }
 
-const modeConfig: SearchModeConfig = {
+const serverConfig: ServerConfig = {
   defaultSearchMode: parseSearchMode('KEENABLE_DEFAULT_SEARCH_MODE'),
   forcedSearchMode: parseSearchMode('KEENABLE_FORCED_SEARCH_MODE'),
+  staging: process.env.KEENABLE_STAGING === '1' || process.env.KEENABLE_STAGING === 'true',
 };
 
-const tools = getTools(modeConfig);
-const toolHandlers = getToolHandlers(modeConfig);
+const tools = getTools(serverConfig);
+const toolHandlers = getToolHandlers(serverConfig);
 
 const server = new Server(
   {

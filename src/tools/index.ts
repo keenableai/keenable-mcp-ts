@@ -1,6 +1,6 @@
-import { ToolDefinition, ToolHandler, SearchModeConfig } from "../types.js";
+import { ToolDefinition, ToolHandler, SearchModeConfig, ServerConfig } from "../types.js";
 import { getSearchTool, createSearchHandler } from "./search.js";
-import { fetchTool, fetchHandler } from "./fetch.js";
+import { fetchTool, createFetchHandler } from "./fetch.js";
 import { feedbackTool, feedbackHandler } from "./feedback.js";
 
 /**
@@ -12,12 +12,12 @@ export function getTools(config?: SearchModeConfig): ToolDefinition[] {
 }
 
 /**
- * Return tool handlers adjusted for the given search mode config.
+ * Return tool handlers adjusted for the given server config.
  */
-export function getToolHandlers(config?: SearchModeConfig): Record<string, ToolHandler> {
+export function getToolHandlers(config?: ServerConfig): Record<string, ToolHandler> {
   return {
     search_web_pages: createSearchHandler(config),
-    fetch_page_content: fetchHandler,
+    fetch_page_content: createFetchHandler(config),
     submit_search_feedback: feedbackHandler,
   };
 }
