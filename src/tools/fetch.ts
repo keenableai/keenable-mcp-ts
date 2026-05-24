@@ -1,4 +1,4 @@
-import { ToolDefinition, ToolHandler, ServerConfig } from "../types.js";
+import { ToolDefinition, ToolHandler, McpServerConfig } from "../types.js";
 import { makeApiRequest, getRateLimitReminder, RateLimitError } from "../api.js";
 
 export const fetchTool: ToolDefinition = {
@@ -27,7 +27,7 @@ export const fetchTool: ToolDefinition = {
   },
 };
 
-export function createFetchHandler(config?: ServerConfig): ToolHandler {
+export function createFetchHandler(config?: McpServerConfig): ToolHandler {
   return async (args, apiKey) => {
   const { urls } = args as { urls: string[] };
 

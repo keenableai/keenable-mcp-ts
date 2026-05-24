@@ -8,11 +8,8 @@ export interface ToolHandler {
 
 export type SearchMode = 'standard' | 'pro';
 
-export interface SearchModeConfig {
+export interface McpServerConfig {
   defaultSearchMode?: SearchMode;
   forcedSearchMode?: SearchMode;
-}
-
-export interface ServerConfig extends SearchModeConfig {
   staging?: boolean;
 }
