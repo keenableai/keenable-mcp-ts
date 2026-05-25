@@ -36,7 +36,7 @@ export const fetchHandler: ToolHandler = async (args, apiKey) => {
       content: [
         {
           type: "text",
-          text: `URL: ${url}\nTitle: ${title}\n\n${content}`,
+          text: `Title: ${title}\nURL: ${url}\n\n${content}`,
         },
       ],
     };
