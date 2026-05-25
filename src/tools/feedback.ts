@@ -22,7 +22,7 @@ export const feedbackTool: ToolDefinition = {
               description: "The result URL being scored",
             },
             score: {
-              type: "number",
+              type: "integer",
               minimum: 0,
               maximum: 5,
               description: "Relevance score from 0 to 5",
