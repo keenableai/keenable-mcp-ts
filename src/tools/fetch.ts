@@ -3,7 +3,7 @@ import { makeApiRequest, getRateLimitReminder, RateLimitError } from "../api.js"
 
 export const fetchTool: ToolDefinition = {
   name: "fetch_page_content",
-  description: `Fetch and extract content from one or more web pages. Returns each page content in markdown format as a separate message. Pass URLs as an array to the "urls" parameter — do not use "url"`,
+  description: `Fetch and extract content from one or more web pages. Returns each page's content in markdown format. Pass URLs as an array to the "urls" parameter — do not use "url"`,
   inputSchema: {
     type: "object",
     properties: {
