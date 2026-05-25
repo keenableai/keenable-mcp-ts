@@ -131,6 +131,7 @@ export function createSearchHandler(config?: SearchModeConfig): ToolHandler {
       for (const r of results) {
         const parts = [`Title: ${r.title}`, `URL: ${r.url}`];
         if (r.published_at) parts.push(`Published: ${r.published_at.slice(0, 10)}`);
+        if (r.acquired_at) parts.push(`Acquired: ${r.acquired_at.slice(0, 10)}`);
         parts.push('');
         if (r.snippet) parts.push(r.snippet);
         else if (r.description) parts.push(r.description);
