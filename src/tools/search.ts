@@ -126,11 +126,24 @@ export function createSearchHandler(config?: SearchModeConfig): ToolHandler {
     try {
       const data = await makeApiRequest("/v1/search", "POST", body, undefined, 3, apiKey);
 
+      const results = Array.isArray(data?.results) ? data.results : [];
+      const lines: string[] = [];
+      for (const r of results) {
+        const parts = [`## ${r.title}`, `URL: ${r.url}`];
+        if (r.published_at) parts.push(`Published: ${r.published_at.slice(0, 10)}`);
+        parts.push('');
+        if (r.snippet) parts.push(r.snippet);
+        else if (r.description) parts.push(r.description);
+        lines.push(parts.join('\n'));
+      }
+
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(data, null, 2),
+            text: lines.length > 0
+              ? lines.join('\n\n---\n\n')
+              : `No results found for "${query}".`,
           }
         ]
       };
