@@ -129,7 +129,7 @@ export function createSearchHandler(config?: SearchModeConfig): ToolHandler {
       const results = Array.isArray(data?.results) ? data.results : [];
       const lines: string[] = [];
       for (const r of results) {
-        const parts = [`## ${r.title}`, `URL: ${r.url}`];
+        const parts = [`Title: ${r.title}`, `URL: ${r.url}`];
         if (r.published_at) parts.push(`Published: ${r.published_at.slice(0, 10)}`);
         parts.push('');
         if (r.snippet) parts.push(r.snippet);
