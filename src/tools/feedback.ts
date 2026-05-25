@@ -14,6 +14,8 @@ export const feedbackTool: ToolDefinition = {
       relevance: {
         type: "array",
         description: "Per-URL relevance scores and comments",
+        minItems: 1,
+        maxItems: 50,
         items: {
           type: "object",
           properties: {
@@ -22,10 +24,10 @@ export const feedbackTool: ToolDefinition = {
               description: "The result URL being scored",
             },
             score: {
-              type: "number",
+              type: "integer",
               minimum: 0,
               maximum: 5,
-              description: "Relevance score from 0 to 5",
+              description: "Integer relevance score from 0 to 5",
             },
             comment: {
               type: "string",

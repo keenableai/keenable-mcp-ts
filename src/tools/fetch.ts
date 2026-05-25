@@ -3,97 +3,63 @@ import { makeApiRequest, getRateLimitReminder, RateLimitError } from "../api.js"
 
 export const fetchTool: ToolDefinition = {
   name: "fetch_page_content",
-  description: `Fetch and extract content from one or more web pages. Returns each page content in markdown format as a separate message. Pass URLs as an array to the "urls" parameter — do not use "url"`,
+  description: `Fetch and extract content from a web page. Returns the page content in markdown format.`,
   inputSchema: {
     type: "object",
     properties: {
-      urls: {
-        type: "array",
-        items: {
-          type: "string",
-        },
-        description: "A JSON array of URLs to fetch. Always pass an array, even for a single URL. Example: [\"https://example.com\"]",
-        minItems: 1,
+      url: {
+        type: "string",
+        description: "The URL to fetch. Example: \"https://example.com\"",
       },
     },
-    required: ["urls"],
+    required: ["url"],
   },
   annotations: {
     title: "Fetch Page Content",
-    readOnlyHint: true,        // This tool only reads and extracts content from URLs without modifying anything
-    destructiveHint: false,    // No data is deleted or overwritten when fetching page content
+    readOnlyHint: true,
+    destructiveHint: false,
     idempotentHint: true,
-    openWorldHint: true,       // Fetches content from the open internet, accessing any publicly available URL
+    openWorldHint: true,
   },
 };
 
 export const fetchHandler: ToolHandler = async (args, apiKey) => {
-  const { urls } = args as { urls: string[] };
+  const { url } = args as { url: string };
 
-  const CHUNK_SIZE = 5;
-  const results: Array<{ url: string; data?: any; error?: string }> = [];
-  
-  let rateLimitError: RateLimitError | null = null;
-  
-  for (let i = 0; i < urls.length; i += CHUNK_SIZE) {
-    const chunk = urls.slice(i, i + CHUNK_SIZE);
-    const chunkResults = await Promise.allSettled(
-      chunk.map(async (url) => {
-        try {
-          const data = await makeApiRequest("/v1/fetch", "GET", undefined, { url }, 3, apiKey);
-          return { url, data };
-        } catch (error) {
-          if (error instanceof RateLimitError) {
-            rateLimitError = error;
-            throw error;
-          }
-          return {
-            url,
-            error: error instanceof Error ? error.message : String(error)
-          };
-        }
-      })
-    );
-    
-    for (const result of chunkResults) {
-      if (result.status === 'fulfilled') {
-        results.push(result.value);
-      } else {
-        if (result.reason instanceof RateLimitError) {
-          rateLimitError = result.reason;
-        }
-      }
-    }
-    
-    if (rateLimitError) {
-      break;
-    }
-  }
+  try {
+    const data = await makeApiRequest("/v1/fetch", "GET", undefined, { url }, 3, apiKey);
 
-  if (rateLimitError) {
+    const title = data?.title || 'Untitled';
+    const content = data?.content || '';
+
     return {
       content: [
         {
           type: "text",
-          text: getRateLimitReminder(rateLimitError),
+          text: `URL: ${url}\nTitle: ${title}\n\n${content}`,
+        },
+      ],
+    };
+  } catch (error) {
+    if (error instanceof RateLimitError) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: getRateLimitReminder(error),
+          },
+        ],
+        isError: true,
+      };
+    }
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error fetching ${url}: ${error instanceof Error ? error.message : String(error)}`,
         },
       ],
       isError: true,
     };
   }
-  
-  const content: any[] = results.map((result) => {
-    if (result.error) {
-      return {
-        type: "text",
-        text: `## URL: ${result.url}\n\n**Error:** ${result.error}`,
-      };
-    }
-    return {
-      type: "text",
-      text: `## URL: ${result.url}\n\n${JSON.stringify(result.data, null, 2)}`,
-    };
-  });
-
-  return { content };
 };
