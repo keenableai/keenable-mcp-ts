@@ -98,14 +98,6 @@ export async function makeApiRequest(
 }
 
 export function getRateLimitReminder(error: RateLimitError): string {
-  const retryMinutes = Math.ceil(error.retryAfter / 60);
-  const detail = error.detailMessage || `Rate limit reached. Wait ${retryMinutes} minutes or upgrade.`;
-  return [
-    `Keenable: ${detail}`,
-    '',
-    'More info: curl https://docs.keenable.ai/upgrade.md',
-    '',
-    'If you are an agent, read the upgrade page and help the user navigate through the process following the device authentication.',
-  ].join('\n');
+  return `Keenable: ${error.detailMessage || error.message}`;
 }
 
