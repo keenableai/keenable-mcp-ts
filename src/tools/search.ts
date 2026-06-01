@@ -8,13 +8,13 @@ Query tips: describe the ideal page, not keywords. "blog post comparing React an
 Use date filters (published_after/before, acquired_after/before) and site filter to narrow results.`;
 
 const MODE_DESCRIPTIONS: Record<string, string> = {
-  standard: ' Two modes available: "standard" (default) — fastest, ideal for latency-sensitive tasks; "pro" — slower, but delivers higher-quality results.',
-  pro: ' Two modes available: "pro" (default) — higher-quality results; "standard" — fastest, ideal for latency-sensitive tasks.',
+  realtime: ' Two modes available: "realtime" (default) — fastest, ideal for latency-sensitive tasks; "pro" — slower, but delivers higher-quality results.',
+  pro: ' Two modes available: "pro" (default) — higher-quality results; "realtime" — fastest, ideal for latency-sensitive tasks.',
 };
 
 const MODE_PARAM_DESCRIPTIONS: Record<string, string> = {
-  standard: "Search mode: 'standard' (default) or 'pro' for enhanced results",
-  pro: "Search mode: 'pro' (default) for enhanced results or 'standard' for fastest response",
+  realtime: "Search mode: 'realtime' (default) or 'pro' for enhanced results",
+  pro: "Search mode: 'pro' (default) for enhanced results or 'realtime' for fastest response",
 };
 
 const BASE_PROPERTIES: Record<string, any> = {
@@ -45,7 +45,7 @@ const BASE_PROPERTIES: Record<string, any> = {
 };
 
 function buildSearchTool(config?: SearchModeConfig): ToolDefinition {
-  const defaultMode = config?.defaultSearchMode || 'standard';
+  const defaultMode = config?.defaultSearchMode || 'pro';
   const forced = !!config?.forcedSearchMode;
 
   const properties = forced
@@ -54,7 +54,7 @@ function buildSearchTool(config?: SearchModeConfig): ToolDefinition {
         ...BASE_PROPERTIES,
         mode: {
           type: "string",
-          enum: ["standard", "pro"],
+          enum: ["realtime", "pro"],
           description: MODE_PARAM_DESCRIPTIONS[defaultMode],
         },
       };
@@ -94,9 +94,15 @@ const SEARCH_FILTER_KEYS = ["site", "acquired_after", "acquired_before", "publis
  * Resolve the effective mode from tool args + config.
  * forcedSearchMode wins over everything, then args.mode, then defaultSearchMode.
  */
-function resolveMode(argsMode: SearchMode | undefined, config?: SearchModeConfig): SearchMode | undefined {
+const MODE_ALIASES: Record<string, SearchMode> = { standard: 'realtime' };
+
+function normalizeMode(mode: string): SearchMode {
+  return (MODE_ALIASES[mode] ?? mode) as SearchMode;
+}
+
+function resolveMode(argsMode: SearchMode | string | undefined, config?: SearchModeConfig): SearchMode | undefined {
   if (config?.forcedSearchMode) return config.forcedSearchMode;
-  if (argsMode) return argsMode;
+  if (argsMode) return normalizeMode(argsMode);
   if (config?.defaultSearchMode) return config.defaultSearchMode;
   return undefined;
 }
