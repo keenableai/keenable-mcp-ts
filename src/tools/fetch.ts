@@ -7,12 +7,14 @@ export const fetchTool: ToolDefinition = {
   inputSchema: {
     type: "object",
     properties: {
-      url: {
-        type: "string",
-        description: "The URL to fetch. Example: \"https://example.com\"",
+      urls: {
+        type: "array",
+        items: { type: "string" },
+        minItems: 1,
+        description: "URLs to fetch (min 1). Example: [\"https://example.com\"]",
       },
     },
-    required: ["url"],
+    required: ["urls"],
   },
   annotations: {
     title: "Fetch Page Content",
@@ -24,42 +26,43 @@ export const fetchTool: ToolDefinition = {
 };
 
 export const fetchHandler: ToolHandler = async (args, apiKey) => {
-  const { url } = args as { url: string };
+  const { urls } = args as { urls: string[] };
 
-  try {
-    const data = await makeApiRequest("/v1/fetch", "GET", undefined, { url }, 3, apiKey);
+  const blocks: string[] = [];
+  const errors: string[] = [];
 
-    const title = data?.title || 'Untitled';
-    const content = data?.content || '';
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Title: ${title}\nURL: ${url}\n\n${content}`,
-        },
-      ],
-    };
-  } catch (error) {
-    if (error instanceof RateLimitError) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: getRateLimitReminder(error),
-          },
-        ],
-        isError: true,
-      };
+  for (const url of urls) {
+    try {
+      const data = await makeApiRequest("/v1/fetch", "GET", undefined, { url }, 3, apiKey);
+      const title = data?.title || 'Untitled';
+      const content = data?.content || '';
+      blocks.push(`Title: ${title}\nURL: ${url}\n\n${content}`);
+    } catch (error) {
+      if (error instanceof RateLimitError) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: getRateLimitReminder(error),
+            },
+          ],
+          isError: true,
+        };
+      }
+      errors.push(`Error fetching ${url}: ${error instanceof Error ? error.message : String(error)}`);
     }
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Error fetching ${url}: ${error instanceof Error ? error.message : String(error)}`,
-        },
-      ],
-      isError: true,
-    };
   }
+
+  const parts = [...blocks];
+  if (errors.length > 0) parts.push(errors.join('\n'));
+
+  return {
+    content: [
+      {
+        type: "text",
+        text: parts.join('\n\n---\n\n') || 'No content fetched.',
+      },
+    ],
+    ...(errors.length > 0 && blocks.length === 0 ? { isError: true } : {}),
+  };
 };
