@@ -6,7 +6,7 @@ export interface ToolHandler {
   (args: any, apiKey?: string): Promise<CallToolResult>;
 }
 
-export type SearchMode = 'standard' | 'pro';
+export type SearchMode = 'realtime' | 'pro';
 
 export interface SearchModeConfig {
   defaultSearchMode?: SearchMode;

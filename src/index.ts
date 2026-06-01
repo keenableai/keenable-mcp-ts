@@ -23,16 +23,18 @@ export { getTools, getToolHandlers } from "./tools/index.js";
 export { getSearchTool, createSearchHandler } from "./tools/search.js";
 export type { ToolDefinition, ToolHandler, SearchModeConfig, SearchMode } from "./types.js";
 
-const VALID_MODES = new Set<string>(['standard', 'pro']);
+const VALID_MODES = new Set<string>(['realtime', 'pro']);
+const MODE_ALIASES: Record<string, SearchMode> = { standard: 'realtime' };
 
 function parseSearchMode(envVar: string): SearchMode | undefined {
   const value = process.env[envVar];
   if (!value) return undefined;
-  if (!VALID_MODES.has(value)) {
-    console.error(`Invalid ${envVar}: "${value}". Valid values: standard, pro`);
+  const resolved = MODE_ALIASES[value] ?? value;
+  if (!VALID_MODES.has(resolved)) {
+    console.error(`Invalid ${envVar}: "${value}". Valid values: realtime, pro`);
     return undefined;
   }
-  return value as SearchMode;
+  return resolved as SearchMode;
 }
 
 const modeConfig: SearchModeConfig = {

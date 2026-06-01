@@ -52,13 +52,13 @@ Search the web and return ranked results with URLs, titles, and descriptions.
 | `acquired_before` | string | no | Filter to pages acquired/indexed before this date (YYYY-MM-DD) |
 | `published_after` | string | no | Filter to pages published after this date (YYYY-MM-DD) |
 | `published_before` | string | no | Filter to pages published before this date (YYYY-MM-DD) |
-| `mode` | string | no | Search mode: `"standard"` (default, fastest) or `"pro"` (higher-quality results) |
+| `mode` | string | no | Search mode: `"pro"` (default, higher-quality results) or `"realtime"` (fastest) |
 
 **Output**
 
 | Field | Type | Description |
 |---|---|---|
-| `mode` | string | Search mode used (`"standard"` or `"pro"`) |
+| `mode` | string | Search mode used (`"realtime"` or `"pro"`) |
 | `results` | array | List of search results |
 | `results[].title` | string | Page title |
 | `results[].url` | string | Page URL |
@@ -71,7 +71,7 @@ Search the web and return ranked results with URLs, titles, and descriptions.
 ```json
 {
   "query": "TypeScript best practices",
-  "mode": "standard",
+  "mode": "pro",
   "results": [
     {
       "title": "TypeScript Best Practices 2026",
@@ -191,7 +191,7 @@ You can control the search mode via environment variables (stdio) or URL query p
 | Default mode | `KEENABLE_DEFAULT_SEARCH_MODE` | `default_search_mode` | Overrides the default when the agent doesn't specify `mode` |
 | Forced mode | `KEENABLE_FORCED_SEARCH_MODE` | `forced_search_mode` | Always uses this mode; hides the `mode` param from the tool schema |
 
-Valid values: `standard`, `pro`.
+Valid values: `realtime`, `pro`.
 
 **Stdio example** — always use pro mode:
 
